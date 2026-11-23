@@ -1,0 +1,17 @@
+{
+  "id": "./index.html",
+  "name": "Rayanton Farms HR - Applicant Form",
+  "short_name": "Rayanton HR",
+  "description": "Applicant registration and HR applications for Rayanton Farms & Livestock Corp.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#1f3a96",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
