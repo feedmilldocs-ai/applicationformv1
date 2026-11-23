@@ -985,16 +985,17 @@ function render(){
   var box=$('list');box.textContent='';
   if(NOTE){var nt=document.createElement('p');nt.className='cnt';nt.style.color='var(--grn)';nt.style.fontWeight='600';nt.textContent=NOTE;box.appendChild(nt)}
   (function(){
-    var tb=document.createElement('div');tb.style.cssText='display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:6px';
-    var fl=document.createElement('div');fl.className='fol';fl.setAttribute('role','group');fl.style.marginBottom='0';
-    [['','All'],['Qualified for Initial Interview','Qualified'],['For Further Assessment','For Further Assessment'],['Not Qualified','Not Qualified'],['none','No assessment yet']].forEach(function(o){
-      var b=document.createElement('button');b.type='button';b.setAttribute('aria-pressed',SF===o[0]?'true':'false');
-      b.appendChild(document.createTextNode(o[1]));var n=document.createElement('span');n.className='n';n.textContent=String(o[0]?(cnts[o[0]]||0):base.length);b.appendChild(n);
-      b.onclick=function(){window.STF=o[0];render()};fl.appendChild(b)});
-    var so=document.createElement('select');so.setAttribute('aria-label','Sort by date');so.style.cssText='width:auto;padding:8px 12px;font-size:.86rem;font-weight:600';
-    [['new','Newest first'],['old','Oldest first']].forEach(function(o){var op=document.createElement('option');op.value=o[0];op.textContent=o[1];so.appendChild(op)});
-    so.value=OLD?'old':'new';so.onchange=function(){window.SORTOLD=so.value==='old';render()};
-    tb.append(fl,so);box.appendChild(tb)})();
+    var tb=document.createElement('div');tb.style.cssText='display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px';
+    function mkSel(label,opts,val,on){
+      var w=document.createElement('label');w.style.cssText='display:flex;flex-direction:column;gap:4px;flex:1 1 200px;min-width:0;font-weight:600;font-size:.8rem;color:var(--mute)';
+      w.appendChild(document.createTextNode(label));
+      var sl=document.createElement('select');sl.style.cssText='width:100%;padding:11px 36px 11px 14px;font-size:.92rem;font-weight:600;color:var(--ink)';
+      opts.forEach(function(o){var op=document.createElement('option');op.value=o[0];op.textContent=o[1];sl.appendChild(op)});
+      sl.value=val;sl.onchange=function(){on(sl.value)};w.appendChild(sl);return w}
+    var fo=[['','All ('+base.length+')'],['Qualified for Initial Interview','Qualified for Initial Interview ('+(cnts['Qualified for Initial Interview']||0)+')'],['For Further Assessment','For Further Assessment ('+(cnts['For Further Assessment']||0)+')'],['Not Qualified','Not Qualified ('+(cnts['Not Qualified']||0)+')'],['none','No assessment yet ('+(cnts['none']||0)+')']];
+    tb.appendChild(mkSel('Status',fo,SF,function(v){window.STF=v;render()}));
+    tb.appendChild(mkSel('Sort by date',[['new','Newest first'],['old','Oldest first']],OLD?'old':'new',function(v){window.SORTOLD=v==='old';render()}));
+    box.appendChild(tb)})();
   if(hid.length){var tg=document.createElement('button');tg.type='button';tg.className='ghost';tg.style.marginBottom='14px';
     tg.textContent=window.SHOWHID?'Isara ang mga nakatago':'Ipakita ang mga nakatago ('+hid.length+')';
     tg.onclick=function(){window.SHOWHID=!window.SHOWHID;render()};box.appendChild(tg)}
