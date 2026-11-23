@@ -29,7 +29,7 @@ h3::after{content:"";flex:1;height:1px;background:var(--line)}
 .f{margin-bottom:20px}
 .f>label,.f>.q{display:block;font-weight:600;margin-bottom:8px;font-size:.93rem}
 .req{color:var(--red)}
-input[type=text],input[type=number],input[type=email],input[type=tel],input[type=date],input[type=search],input[type=password],select,textarea{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--fld);color:var(--ink);font:inherit;transition:border-color .15s,box-shadow .15s,background .15s}
+input[type=text],input[type=number],input[type=email],input[type=tel],input[type=date],input[type=time],input[type=search],input[type=password],select,textarea{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--fld);color:var(--ink);font:inherit;transition:border-color .15s,box-shadow .15s,background .15s}
 input:focus,select:focus,textarea:focus{outline:0;border-color:var(--acc);background:var(--card);box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 18%,transparent)}
 textarea{min-height:80px;resize:vertical}
 .opts{display:grid;gap:8px}
@@ -956,7 +956,10 @@ function hrPanel(r){
   var tm=document.createElement('input');tm.type='time';tm.value=sc.time||'';
   var c3=document.createElement('div'),row3=document.createElement('div');row3.className='row2';
   c1.append(l2,st);c2.append(l3,dt);c3.append(l4,tm);row.append(c1);row3.append(c2,c3);
-  box.append(l1,ta,row,row3);
+  var qbox=document.createElement('div');qbox.append(row,row3);
+  box.append(l1,ta,qbox);
+  function vis(){var c=box.querySelector('input[type=radio]:checked');qbox.classList.toggle('hidden',!c||c.value!=='Qualified for Initial Interview')}
+  og.addEventListener('change',vis);vis();
   var bar=document.createElement('div');bar.className='acts';
   var sv=document.createElement('button');sv.type='button';sv.textContent='I-save ang Assessment';
   var msg=document.createElement('span');msg.className='sm';
@@ -964,7 +967,8 @@ function hrPanel(r){
   sv.onclick=function(){
     var ch=box.querySelector('input[type=radio]:checked');
     if(!ch){msg.textContent='Pumili muna ng assessment.';msg.style.color='var(--err)';return}
-    var o={result:ch.value,remarks:ta.value.trim(),staff:st.value.trim(),date:dt.value,time:tm.value,at:Date.now()};
+    var isQ=ch.value==='Qualified for Initial Interview';
+    var o={result:ch.value,remarks:ta.value.trim(),staff:isQ?st.value.trim():'',date:isQ?dt.value:'',time:isQ?tm.value:'',at:Date.now()};
     msg.style.color='';msg.textContent='Sine-save…';sv.disabled=true;
     var stt=HRMAP[ch.value];NOTE='✓ Na-update ang status ni '+(r.name||'aplikante')+': '+stt;clearNote();
     dbp.collection('reviews').doc(r.id).set(Object.assign({},REV[r.id]||{},{screen:o,status:stt})).then(function(){msg.textContent='✓ Na-save · status: '+stt},function(){msg.style.color='var(--err)';msg.textContent='Hindi na-save. Subukan muli.'}).then(function(){sv.disabled=false});
