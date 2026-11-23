@@ -930,7 +930,7 @@ function buildFolders(total,cnt){
   if(NOTE){var p=document.createElement('p');p.className='cnt';p.style.color='var(--grn)';p.style.fontWeight='600';p.textContent=NOTE;f.appendChild(p)}
 }
 var HRO=['Qualified for Initial Interview','For Further Assessment','Not Qualified'];
-function scr(r){var q=(REV[r.id]&&REV[r.id].screen)||{};return [q.result||'',q.remarks||'',q.staff||'',q.date||'']}
+function scr(r){var q=(REV[r.id]&&REV[r.id].screen)||{};return [q.result||'',q.remarks||'',q.staff||'',q.date||'',q.time||'']}
 function todayISO(){var t=new Date();return t.getFullYear()+'-'+('0'+(t.getMonth()+1)).slice(-2)+'-'+('0'+t.getDate()).slice(-2)}
 function hrPanel(r){
   var sc=(REV[r.id]&&REV[r.id].screen)||{},box=document.createElement('div');box.className='hrbox';
@@ -952,8 +952,11 @@ function hrPanel(r){
   var st=document.createElement('input');st.type='text';st.value=sc.staff||'';st.maxLength=80;
   var l3=document.createElement('span');l3.className='lb2';l3.textContent='Interview Date:';
   var dt=document.createElement('input');dt.type='date';dt.value=sc.date||'';
-  c1.append(l2,st);c2.append(l3,dt);row.append(c1,c2);
-  box.append(l1,ta,row);
+  var l4=document.createElement('span');l4.className='lb2';l4.textContent='Interview Time:';
+  var tm=document.createElement('input');tm.type='time';tm.value=sc.time||'';
+  var c3=document.createElement('div'),row3=document.createElement('div');row3.className='row2';
+  c1.append(l2,st);c2.append(l3,dt);c3.append(l4,tm);row.append(c1);row3.append(c2,c3);
+  box.append(l1,ta,row,row3);
   var bar=document.createElement('div');bar.className='acts';
   var sv=document.createElement('button');sv.type='button';sv.textContent='I-save ang Assessment';
   var msg=document.createElement('span');msg.className='sm';
@@ -961,7 +964,7 @@ function hrPanel(r){
   sv.onclick=function(){
     var ch=box.querySelector('input[type=radio]:checked');
     if(!ch){msg.textContent='Pumili muna ng assessment.';msg.style.color='var(--err)';return}
-    var o={result:ch.value,remarks:ta.value.trim(),staff:st.value.trim(),date:dt.value,at:Date.now()};
+    var o={result:ch.value,remarks:ta.value.trim(),staff:st.value.trim(),date:dt.value,time:tm.value,at:Date.now()};
     msg.style.color='';msg.textContent='Sine-save…';sv.disabled=true;
     var stt=HRMAP[ch.value];NOTE='✓ Na-update ang status ni '+(r.name||'aplikante')+': '+stt;clearNote();
     dbp.collection('reviews').doc(r.id).set(Object.assign({},REV[r.id]||{},{screen:o,status:stt})).then(function(){msg.textContent='✓ Na-save · status: '+stt},function(){msg.style.color='var(--err)';msg.textContent='Hindi na-save. Subukan muli.'}).then(function(){sv.disabled=false});
@@ -1014,8 +1017,9 @@ function render(){
     else if(sr==='Not Qualified'){st.style.background='color-mix(in srgb,var(--err) 14%,transparent)';st.style.color='var(--err)'}
     else if(sr==='For Further Assessment'){st.style.background='color-mix(in srgb,var(--yel) 30%,transparent)';st.style.color='var(--ink)'}
     h.append(b,bd,mt,st);
-    var idt=scr(r)[3];if(idt){var iv=document.createElement('span');iv.className='badge';iv.style.fontWeight='700';
-      var dd=new Date(idt+'T00:00:00');iv.textContent='📅 Interview: '+(isNaN(dd)?idt:dd.toLocaleDateString('en-PH',{year:'numeric',month:'short',day:'numeric'}));h.appendChild(iv)}
+    var idt=scr(r)[3],itm=scr(r)[4];if(idt||itm){var iv=document.createElement('span');iv.className='badge';iv.style.fontWeight='700';
+      var dd=idt?new Date(idt+'T00:00:00'):null,ds=dd?(isNaN(dd)?idt:dd.toLocaleDateString('en-PH',{year:'numeric',month:'short',day:'numeric'})):'';
+      iv.textContent='📅 Interview: '+[ds,itm?fmtT(itm):''].filter(Boolean).join(' · ');h.appendChild(iv)}
     if(r.photo){var av=document.createElement('img');av.src=r.photo;av.alt='';av.style.cssText='width:44px;height:44px;border-radius:50%;object-fit:cover';h.prepend(av)}
     c.appendChild(h);
     var det=document.createElement('div');det.className='det'+(OPEN[r.id]?'':' hidden');
@@ -1047,7 +1051,7 @@ function render(){
 $('csv').onclick=async function(){
   var cols=[];rows.forEach(function(r){Object.keys(r.ans||{}).forEach(function(k){if(cols.indexOf(k)<0)cols.push(k)})});
   var q=function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'};
-  var out=[['Petsa ng Pagsumite','Status','Position'].concat(cols).concat(['Initial Screening','Screening Remarks','HR Staff','Interview Date']).map(q).join(',')];
+  var out=[['Petsa ng Pagsumite','Status','Position'].concat(cols).concat(['Initial Screening','Screening Remarks','HR Staff','Interview Date','Interview Time']).map(q).join(',')];
   rows.forEach(function(r){out.push([new Date(r.submittedAt).toLocaleString('en-PH'),r.status,r.position].concat(cols.map(function(k){return (r.ans||{})[k]})).concat(scr(r)).map(q).join(','))});
   try{var bl=new Blob(['\ufeff'+out.join('\n')],{type:'text/csv;charset=utf-8'}),an=document.createElement('a');an.href=URL.createObjectURL(bl);an.download='applications.csv';document.body.appendChild(an);an.click();an.remove()}catch(e){}
 };
@@ -1101,7 +1105,7 @@ function printRec(r){
   var hd=mk('div','phd');hd.appendChild(mk('div','pco','RAYANTON FARMS & LIVESTOCK CORP.'));hd.appendChild(mk('div','pti','Applicant Registration Form'));pa.appendChild(hd);
   var v=recView(r,true);
   var sc=scr(r),hr=[];
-  [['Initial Screening',sc[0]],['Screening Remarks',sc[1]],['HR Staff',sc[2]],['Interview Date',sc[3]]].forEach(function(x){if(x[1])hr.push([x[0],String(x[1]),x[0]==='Screening Remarks'])});
+  [['Initial Screening',sc[0]],['Screening Remarks',sc[1]],['HR Staff',sc[2]],['Interview Date',sc[3]],['Interview Time',sc[4]?fmtT(sc[4]):'']].forEach(function(x){if(x[1])hr.push([x[0],String(x[1]),x[0]==='Screening Remarks'])});
   if(hr.length)v.appendChild(recGrid('PARA SA HR DEPARTMENT LAMANG',hr));
   pa.appendChild(v);
   if(window.trTree)window.trTree(pa);
