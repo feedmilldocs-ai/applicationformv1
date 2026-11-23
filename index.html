@@ -3,14 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#1f3a96">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Rayanton HR">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" href="icon-192.png">
 <title>Rayanton Farms – Applicant Registration Form</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
 <style>
@@ -958,8 +950,8 @@ function hrPanel(r){
   var c1=document.createElement('div'),c2=document.createElement('div');
   var l2=document.createElement('span');l2.className='lb2';l2.textContent='HR Staff:';
   var st=document.createElement('input');st.type='text';st.value=sc.staff||'';st.maxLength=80;
-  var l3=document.createElement('span');l3.className='lb2';l3.textContent='Screening Date:';
-  var dt=document.createElement('input');dt.type='date';dt.value=sc.date||todayISO();
+  var l3=document.createElement('span');l3.className='lb2';l3.textContent='Interview Date:';
+  var dt=document.createElement('input');dt.type='date';dt.value=sc.date||'';
   c1.append(l2,st);c2.append(l3,dt);row.append(c1,c2);
   box.append(l1,ta,row);
   var bar=document.createElement('div');bar.className='acts';
@@ -982,17 +974,32 @@ function render(){
   Object.keys(labs).sort().forEach(function(l){var o=document.createElement('option');o.value=l;o.textContent=l;fp.appendChild(o)});fp.value=cur0;
   var q=$('q').value.toLowerCase(),fv=fp.value;
   var base=rows.filter(function(r){r.status=(REV[r.id]&&REV[r.id].status)||'Bago';return !(REV[r.id]&&REV[r.id].hidden)&&(!fv||r.position===fv)&&(!q||((r.name||'')+' '+(r.contact||'')).toLowerCase().indexOf(q)>-1)});
-  var list=base,hid=rows.filter(function(r){return REV[r.id]&&REV[r.id].hidden});
+  function stg(r){return scr(r)[0]||'none'}
+  var cnts={};base.forEach(function(r){var k=stg(r);cnts[k]=(cnts[k]||0)+1});
+  var SF=window.STF||'',OLD=window.SORTOLD===true;
+  function byDate(a,b){return OLD?a.submittedAt-b.submittedAt:b.submittedAt-a.submittedAt}
+  var list=base.filter(function(r){return !SF||stg(r)===SF}).sort(byDate),hid=rows.filter(function(r){return REV[r.id]&&REV[r.id].hidden}).sort(byDate);
   window.SHOWHID=window.SHOWHID&&hid.length>0;
   var oldF=$('folders');if(oldF)oldF.remove();
   $('count').textContent=list.length+' aplikasyon';
   var box=$('list');box.textContent='';
   if(NOTE){var nt=document.createElement('p');nt.className='cnt';nt.style.color='var(--grn)';nt.style.fontWeight='600';nt.textContent=NOTE;box.appendChild(nt)}
+  (function(){
+    var tb=document.createElement('div');tb.style.cssText='display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:6px';
+    var fl=document.createElement('div');fl.className='fol';fl.setAttribute('role','group');fl.style.marginBottom='0';
+    [['','All'],['Qualified for Initial Interview','Qualified'],['For Further Assessment','For Further Assessment'],['Not Qualified','Not Qualified'],['none','No assessment yet']].forEach(function(o){
+      var b=document.createElement('button');b.type='button';b.setAttribute('aria-pressed',SF===o[0]?'true':'false');
+      b.appendChild(document.createTextNode(o[1]));var n=document.createElement('span');n.className='n';n.textContent=String(o[0]?(cnts[o[0]]||0):base.length);b.appendChild(n);
+      b.onclick=function(){window.STF=o[0];render()};fl.appendChild(b)});
+    var so=document.createElement('select');so.setAttribute('aria-label','Sort by date');so.style.cssText='width:auto;padding:8px 12px;font-size:.86rem;font-weight:600';
+    [['new','Newest first'],['old','Oldest first']].forEach(function(o){var op=document.createElement('option');op.value=o[0];op.textContent=o[1];so.appendChild(op)});
+    so.value=OLD?'old':'new';so.onchange=function(){window.SORTOLD=so.value==='old';render()};
+    tb.append(fl,so);box.appendChild(tb)})();
   if(hid.length){var tg=document.createElement('button');tg.type='button';tg.className='ghost';tg.style.marginBottom='14px';
     tg.textContent=window.SHOWHID?'Isara ang mga nakatago':'Ipakita ang mga nakatago ('+hid.length+')';
     tg.onclick=function(){window.SHOWHID=!window.SHOWHID;render()};box.appendChild(tg)}
   if(window.SHOWHID){var hs=document.createElement('div');hs.style.cssText='opacity:.75;margin-bottom:18px';var hh=document.createElement('p');hh.className='cnt';hh.textContent='Mga nakatago';hh.style.fontWeight='700';hs.appendChild(hh);hid.forEach(function(r){r.status=(REV[r.id]&&REV[r.id].status)||'Bago'});box.appendChild(hs);var HIDBOX=hs}
-  if(!list.length){var e=document.createElement('p');e.className='cnt';e.textContent=rows.length?'Walang tugma sa hinahanap.':'Wala pang nagsusumite.';box.appendChild(e)}else mkCards(list,box);
+  if(!list.length){var e=document.createElement('p');e.className='cnt';e.textContent=!rows.length?'Wala pang nagsusumite.':(base.length&&SF)?'No applicants in this group.':'Walang tugma sa hinahanap.';box.appendChild(e)}else mkCards(list,box);
   function mkCards(arr,tgt){arr.forEach(function(r){
     var c=document.createElement('div');c.className='card';
     var h=document.createElement('div');h.className='h';
@@ -1006,6 +1013,8 @@ function render(){
     else if(sr==='Not Qualified'){st.style.background='color-mix(in srgb,var(--err) 14%,transparent)';st.style.color='var(--err)'}
     else if(sr==='For Further Assessment'){st.style.background='color-mix(in srgb,var(--yel) 30%,transparent)';st.style.color='var(--ink)'}
     h.append(b,bd,mt,st);
+    var idt=scr(r)[3];if(idt){var iv=document.createElement('span');iv.className='badge';iv.style.fontWeight='700';
+      var dd=new Date(idt+'T00:00:00');iv.textContent='📅 Interview: '+(isNaN(dd)?idt:dd.toLocaleDateString('en-PH',{year:'numeric',month:'short',day:'numeric'}));h.appendChild(iv)}
     if(r.photo){var av=document.createElement('img');av.src=r.photo;av.alt='';av.style.cssText='width:44px;height:44px;border-radius:50%;object-fit:cover';h.prepend(av)}
     c.appendChild(h);
     var det=document.createElement('div');det.className='det'+(OPEN[r.id]?'':' hidden');
@@ -1037,7 +1046,7 @@ function render(){
 $('csv').onclick=async function(){
   var cols=[];rows.forEach(function(r){Object.keys(r.ans||{}).forEach(function(k){if(cols.indexOf(k)<0)cols.push(k)})});
   var q=function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'};
-  var out=[['Petsa ng Pagsumite','Status','Position'].concat(cols).concat(['Initial Screening','Screening Remarks','HR Staff','Screening Date']).map(q).join(',')];
+  var out=[['Petsa ng Pagsumite','Status','Position'].concat(cols).concat(['Initial Screening','Screening Remarks','HR Staff','Interview Date']).map(q).join(',')];
   rows.forEach(function(r){out.push([new Date(r.submittedAt).toLocaleString('en-PH'),r.status,r.position].concat(cols.map(function(k){return (r.ans||{})[k]})).concat(scr(r)).map(q).join(','))});
   try{var bl=new Blob(['\ufeff'+out.join('\n')],{type:'text/csv;charset=utf-8'}),an=document.createElement('a');an.href=URL.createObjectURL(bl);an.download='applications.csv';document.body.appendChild(an);an.click();an.remove()}catch(e){}
 };
@@ -1091,7 +1100,7 @@ function printRec(r){
   var hd=mk('div','phd');hd.appendChild(mk('div','pco','RAYANTON FARMS & LIVESTOCK CORP.'));hd.appendChild(mk('div','pti','Applicant Registration Form'));pa.appendChild(hd);
   var v=recView(r,true);
   var sc=scr(r),hr=[];
-  [['Initial Screening',sc[0]],['Screening Remarks',sc[1]],['HR Staff',sc[2]],['Screening Date',sc[3]]].forEach(function(x){if(x[1])hr.push([x[0],String(x[1]),x[0]==='Screening Remarks'])});
+  [['Initial Screening',sc[0]],['Screening Remarks',sc[1]],['HR Staff',sc[2]],['Interview Date',sc[3]]].forEach(function(x){if(x[1])hr.push([x[0],String(x[1]),x[0]==='Screening Remarks'])});
   if(hr.length)v.appendChild(recGrid('PARA SA HR DEPARTMENT LAMANG',hr));
   pa.appendChild(v);
   if(window.trTree)window.trTree(pa);
@@ -1172,6 +1181,5 @@ window.onAdminLang=run;
 run();
 })();
 </script>
-<script>if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
 </body>
 </html>
