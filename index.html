@@ -206,6 +206,7 @@ select{appearance:none;-webkit-appearance:none;padding-right:42px;background-ima
   #printArea .rec .rg>div>span,#printArea .rec .rh .sub{color:#444}
   #printArea .rec .rh h4{color:#000}
 }
+@media(max-width:560px){.top .in{flex-wrap:wrap;row-gap:8px}.tt{flex:1 1 calc(100% - 70px);min-width:0}.tt b{font-size:.95rem}.top .in .lang{margin-right:auto}.top #adminBtn{padding:7px 14px;font-size:.82rem}}
 </style>
 </head>
 <body>
@@ -225,7 +226,7 @@ select{appearance:none;-webkit-appearance:none;padding-right:42px;background-ima
 </section>
 </div>
 <div id="viewAdmin" class="hidden">
-<div class="bar"><h1>Mga Aplikasyon</h1><div class="btns"><div class="setwrap"><button id="setBtn" type="button" class="alt" aria-haspopup="true" aria-expanded="false" aria-controls="setMenu">⚙ Settings</button><div id="setMenu" class="hidden" role="menu"><button id="tabA" type="button" role="menuitem">Mga Aplikasyon</button><button id="tabP" type="button" class="alt" role="menuitem">Mga Position at Tanong</button></div></div><button id="lock" type="button" class="danger hidden">Mag-logout</button><button id="back" type="button" class="ghost">Bumalik sa form</button></div></div>
+<div class="bar"><h1>Mga Aplikasyon</h1><div class="btns"><div class="setwrap"><button id="setBtn" type="button" class="alt" aria-haspopup="true" aria-expanded="false" aria-controls="setMenu">⚙ Settings</button><div id="setMenu" class="hidden" role="menu"><button id="tabA" type="button" role="menuitem">Mga Aplikasyon</button><button id="tabP" type="button" class="alt" role="menuitem">Mga Position at Tanong</button><button id="tabN" type="button" class="alt" role="menuitem">🔔 Notification</button></div></div><button id="lock" type="button" class="danger hidden">Mag-logout</button><button id="back" type="button" class="ghost">Bumalik sa form</button></div></div>
 <section id="gate" class="gate"><h2>Admin Login</h2><p id="gateMsg" role="status">Sinusuri ang iyong access…</p><div id="pwBox" class="hidden" style="max-width:340px;margin:0 auto;text-align:left"><div class="f"><label for="em">Email</label><input id="em" type="email" autocomplete="username"></div><div class="f"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password"></div><label class="opt" for="rem" style="margin-bottom:16px"><input id="rem" type="checkbox" checked> <span>Tandaan ako sa device na ito</span></label><div class="f hidden" id="pw2f"><label for="pw2">Ulitin ang password</label><input id="pw2" type="password" autocomplete="new-password"></div><div class="btns" style="justify-content:center"><button id="pwGo" type="button">Mag-login</button></div></div><div class="btns" style="justify-content:center;margin-top:12px"><button id="retry" type="button" class="alt">Subukan muli</button></div></section>
 <div id="adminBody" class="hidden">
 
@@ -234,6 +235,7 @@ select{appearance:none;-webkit-appearance:none;padding-right:42px;background-ima
 <p class="cnt hidden" id="count"></p><div id="list"></div></div>
 <div id="posBack"><button id="posBackBtn" type="button" class="ghost">← Bumalik sa mga aplikasyon</button></div>
 <div id="tabPos" class="hidden"></div>
+<div id="tabNot" class="hidden"></div>
 </div>
 </div>
 </div>
@@ -315,7 +317,7 @@ var DEFPOS=POS;
 var DOCS=[{t:'check',n:'docs',l:'Mga dokumentong maaaring isumite',o:['Updated Resume / Biodata','Photocopy ng Valid ID','Certificate of Employment (kung mayroon)','Transcript of Records / Diploma (kung mayroon)','NBI Clearance (kung mayroon)','SSS','Pag-IBIG','PhilHealth','TIN','Iba pa:']}];
 
 
-var EN={"Kumuha ng larawan":"Take photo","Kunan":"Capture","Kanselahin":"Cancel","Ilagay ang dokumento sa loob ng frame at siguraduhing malinaw.":"Place the document inside the frame and make sure it is clear.",
+var EN={"Malabo ang larawan. Mag-retake o mag-upload ng mas malinaw na larawan.":"The photo is blurry. Please retake it or upload a clearer photo.","Malabo ang larawan. Hawakan nang steady, siguraduhing maliwanag, at kunan muli.":"The photo is blurry. Hold the device steady, make sure there is good light, and take it again.","Kumuha ng larawan":"Take photo","Kunan":"Capture","Kanselahin":"Cancel","Ilagay ang dokumento sa loob ng frame at siguraduhing malinaw.":"Place the document inside the frame and make sure it is clear.",
 "Mangyaring sagutan nang tama at kumpleto ang mga sumusunod na impormasyon. Ang mga ito ay gagamitin ng HR Department para sa paunang pagsusuri ng inyong aplikasyon.":"Please answer the following information accurately and completely. It will be used by the HR Department for the initial review of your application.",
 "Isumite ang aplikasyon":"Submit application","I-clear lahat":"Clear all","Nakumpleto ang form":"Form completed","I-download (.txt)":"Download (.txt)","I-print":"Print",
 "Isinusumite ang aplikasyon…":"Submitting your application…",
@@ -494,7 +496,12 @@ function doUpload(doc,file,u){
   var okType=/^(application\/pdf|image\/(jpeg|png|webp))$/.test(file.type)||/\.pdf$/i.test(file.name);
   if(!okType){ERR[doc]=T('PDF, JPG o PNG lang, hanggang 8 MB bawat file.');renderUps();return}
   if(file.size>8*1048576){ERR[doc]=T('Masyadong malaki ang file. Hanggang 8 MB lang.');renderUps();return}
-  getAssets().then(function(a){
+  var sharpP=/^image\//.test(file.type)?isSharp(file,BLUR_DOC):Promise.resolve(true);
+  sharpP.then(function(ok){
+    if(!ok){ERR[doc]=T('Malabo ang larawan. Mag-retake o mag-upload ng mas malinaw na larawan.');renderUps();return}
+    return getAssets();
+  }).then(function(a){
+    if(a===undefined)return;
     if(!a){renderUps();return}
     var old=FILES[doc];FILES[doc]={busy:1,name:file.name};renderUps();
     return prepFile(file).then(function(b){
@@ -509,6 +516,24 @@ function doUpload(doc,file,u){
       var c=e&&e.code;
       ERR[doc]=c==='too_large'?T('Masyadong malaki ang file. Hanggang 8 MB lang.'):c==='unsupported_type'?T('PDF, JPG o PNG lang, hanggang 8 MB bawat file.'):c==='quota_or_state'?T('Puno na ang storage. Sabihan ang HR.'):T('Hindi na-upload. Subukan muli.');
     }).then(renderUps);
+  });
+}
+/* ===== Blur detection (Laplacian variance) ===== */
+var BLUR_DOC=80,BLUR_SELFIE=40;
+function blurScore(src,w,h){
+  var k=Math.min(1,640/Math.max(w,h)),cw=Math.max(8,Math.round(w*k)),ch=Math.max(8,Math.round(h*k)),c=document.createElement('canvas');
+  c.width=cw;c.height=ch;var x=c.getContext('2d',{willReadFrequently:true});x.drawImage(src,0,0,cw,ch);
+  var d=x.getImageData(0,0,cw,ch).data,g=new Float32Array(cw*ch),i,j;
+  for(i=0;i<g.length;i++)g[i]=0.299*d[i*4]+0.587*d[i*4+1]+0.114*d[i*4+2];
+  var sum=0,sq=0,n=0,v;
+  for(j=1;j<ch-1;j++)for(i=1;i<cw-1;i++){v=-4*g[j*cw+i]+g[j*cw+i-1]+g[j*cw+i+1]+g[(j-1)*cw+i]+g[(j+1)*cw+i];sum+=v;sq+=v*v;n++}
+  var m=sum/n;return sq/n-m*m;
+}
+function isSharp(file,min){
+  return new Promise(function(res){
+    var u=URL.createObjectURL(file),img=new Image();
+    img.onload=function(){var ok=true;try{ok=blurScore(img,img.naturalWidth,img.naturalHeight)>=min}catch(e){}URL.revokeObjectURL(u);res(ok)};
+    img.onerror=function(){URL.revokeObjectURL(u);res(true)};img.src=u;
   });
 }
 function ageFrom(v){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v||'');if(!m)return null;var t=new Date(),a=t.getFullYear()-(+m[1]);if(t.getMonth()+1<+m[2]||(t.getMonth()+1===+m[2]&&t.getDate()<+m[3]))a--;return a}
@@ -558,7 +583,10 @@ function attachPhoto(){
     try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});var v=$('camVid');v.srcObject=stream;await v.play();$('camBox').classList.remove('hidden')}
     catch(e){stopCam();cm.textContent=(e&&(e.name==='NotAllowedError'||e.name==='SecurityError'))?T('Hindi ma-access ang camera. Payagan ang camera permission sa browser, tapos pindutin muli ang "Kumuha ng larawan".'):T('Walang nakitang camera sa device na ito. Gumamit ng phone o device na may camera.');cm.classList.remove('hidden')}
   };
-  $('camSnap').onclick=function(){var v=$('camVid');if(!v.videoWidth)return;photoData=shrink(v,v.videoWidth,v.videoHeight);stopCam();renderPhoto()};
+  $('camSnap').onclick=function(){var v=$('camVid'),cm=$('camMsg');if(!v.videoWidth)return;
+    var sharp=true;try{sharp=blurScore(v,v.videoWidth,v.videoHeight)>=BLUR_SELFIE}catch(e){}
+    if(!sharp){cm.textContent=T('Malabo ang larawan. Hawakan nang steady, siguraduhing maliwanag, at kunan muli.');cm.classList.remove('hidden');return}
+    cm.classList.add('hidden');photoData=shrink(v,v.videoWidth,v.videoHeight);stopCam();renderPhoto()};
   $('camCancel').onclick=stopCam;
   $('photoRe').onclick=function(){photoData=null;renderPhoto();$('photoBtn').click()};
   renderPhoto();
@@ -694,7 +722,7 @@ var STORE={
 var sb=null;try{sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{storage:STORE,persistSession:true,autoRefreshToken:true}})}catch(e){}
 var WATCH=[];
 function refreshAll(){WATCH.forEach(function(f){f()})}
-function watch(fetcher,cb,err){var stop=false,first=true;function run(){fetcher().then(function(d){if(!stop)cb({docs:d})},function(e){if(!stop&&first&&err)err(e)}).then(function(){first=false})}run();var t=setInterval(function(){if(!document.hidden)run()},20000);WATCH.push(run);return function(){stop=true;clearInterval(t);var k=WATCH.indexOf(run);if(k>-1)WATCH.splice(k,1)}}
+function watch(fetcher,cb,err){var stop=false,first=true;function run(){fetcher().then(function(d){if(!stop)cb({docs:d})},function(e){if(!stop&&first&&err)err(e)}).then(function(){first=false})}run();var t=setInterval(function(){if(!document.hidden||window.NOTIFBG)run()},20000);WATCH.push(run);return function(){stop=true;clearInterval(t);var k=WATCH.indexOf(run);if(k>-1)WATCH.splice(k,1)}}
 function ck(r){if(r.error)throw r.error;return r.data}
 function DOC(id,data){return {id:id,exists:true,data:function(){return data}}}
 async function posDocs(){var rows=ck(await sb.from('positions').select('*').order('sort'));var d=rows.map(function(r){return DOC(r.id,{label:r.label,active:r.enabled,order:r.sort,f:r.fields||[]})});if(rows.length)d.push(DOC('_meta',{initialized:true}));return d}
@@ -760,7 +788,7 @@ async function hashPw(pw,saltHex){
   var k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveBits']);
   return hex(await crypto.subtle.deriveBits({name:'PBKDF2',salt:salt,iterations:200000,hash:'SHA-256'},k,256));
 }
-function lockAdmin(){unlocked=false;if(unsub){unsub();unsub=null}rows=[];REV={};ADMPOS=[];DRAFT=null;POSINIT=false;$('tabPos').textContent='';$('list').textContent='';$('pw').value='';$('em').value='';$('lock').classList.add('hidden');try{if(sb)sb.auth.signOut()}catch(e){}show('form')}
+function lockAdmin(){unlocked=false;SEEN=null;window.NOTIFBG=false;if(unsub){unsub();unsub=null}rows=[];REV={};ADMPOS=[];DRAFT=null;POSINIT=false;$('tabPos').textContent='';$('list').textContent='';$('pw').value='';$('em').value='';$('lock').classList.add('hidden');try{if(sb)sb.auth.signOut()}catch(e){}show('form')}
 async function isAdm(){var r=await sb.auth.getSession(),u=r.data&&r.data.session&&r.data.session.user;if(!u)return null;var q=await sb.from('admins').select('user_id').eq('user_id',u.id).maybeSingle();if(q.error)throw q.error;return !!q.data}
 async function openAdmin(){
   show('admin');$('adminBody').classList.add('hidden');$('lock').classList.add('hidden');$('gate').classList.remove('hidden');$('pwBox').classList.add('hidden');$('pw').value='';$('pw2f').classList.add('hidden');
@@ -802,7 +830,7 @@ async function seedDefaults(){
   try{var i=0;for(var k in DEFPOS){i++;await savePos({id:k,label:DEFPOS[k].label,active:true,order:i,f:DEFPOS[k].f})}await markInit();pmsg('Handa na. Puwede mo nang baguhin ang mga position.')}catch(e){pmsg('Hindi na-save. Subukan muli.')}
 }
 function swapPos(a,b){return Promise.all([savePos(Object.assign({},a,{order:b.order})),savePos(Object.assign({},b,{order:a.order}))])}
-function showTab(t){$('tabApps').classList.toggle('hidden',t!=='a');$('tabPos').classList.toggle('hidden',t!=='p');$('tabA').className=t==='a'?'':'alt';$('tabP').className=t==='p'?'':'alt';}
+function showTab(t){$('tabApps').classList.toggle('hidden',t!=='a');$('tabPos').classList.toggle('hidden',t!=='p');$('tabNot').classList.toggle('hidden',t!=='n');$('tabA').className=t==='a'?'':'alt';$('tabP').className=t==='p'?'':'alt';$('tabN').className=t==='n'?'':'alt';if(t==='n')renderNot();}
 function editor(){
   var d=DRAFT,w=mk('div','det');
   var ln=mk('div');ln.appendChild(mk('span','','Pangalan ng position'));
@@ -897,12 +925,13 @@ function setMenu(o){$('setMenu').classList.toggle('hidden',!o);$('setBtn').setAt
 $('setBtn').onclick=function(e){e.stopPropagation();setMenu($('setMenu').classList.contains('hidden'))};
 document.addEventListener('click',function(e){if(!$('setMenu').contains(e.target))setMenu(false)});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')setMenu(false)});
-$('tabA').onclick=function(){showTab('a');setMenu(false)};$('posBackBtn').onclick=function(){showTab('a')};$('tabP').onclick=function(){showTab('p');setMenu(false)};
+$('tabA').onclick=function(){showTab('a');setMenu(false)};$('posBackBtn').onclick=function(){showTab('a')};$('tabP').onclick=function(){showTab('p');setMenu(false)};$('tabN').onclick=function(){actx();showTab('n');setMenu(false)};
 function loadAdmin(){
   $('gate').classList.add('hidden');$('adminBody').classList.remove('hidden');$('lock').classList.remove('hidden');showTab('a');
   if(unsub)unsub();
+  SEEN=null;window.NOTIFBG=true;actx();
   var t=setTimeout(function(){$('count').textContent='Matagal ang pag-load. Subukan muli.'},10000),rev={},err=function(){clearTimeout(t);$('count').textContent='Hindi mabasa ang mga aplikasyon. Admin lang ang may access.'};
-  var u1=dbp.collection('applications').onSnapshot(function(sn){clearTimeout(t);rows=sn.docs.map(function(x){var d=x.data();d.id=x.id;return d}).sort(function(a,b){return b.submittedAt-a.submittedAt});render()},err);
+  var u1=dbp.collection('applications').onSnapshot(function(sn){clearTimeout(t);rows=sn.docs.map(function(x){var d=x.data();d.id=x.id;return d}).sort(function(a,b){return b.submittedAt-a.submittedAt});checkNew();render()},err);
   var u2=dbp.collection('reviews').onSnapshot(function(sn){REV={};sn.docs.forEach(function(x){REV[x.id]=x.data()});render()},function(){});
   var u3=dbp.collection('positions').onSnapshot(function(sn){POSINIT=sn.docs.some(function(x){return x.id==='_meta'});ADMPOS=sn.docs.filter(function(x){return x.id!=='_meta'}).map(function(x){var d=x.data();return {id:x.id,label:d.label||'',active:d.active!==false,order:d.order||0,f:d.f||[]}}).sort(function(a,b){return a.order-b.order});renderPos();render()},function(){});
   try{dbp.collection('config').doc('sms').get().then(function(d){if(d&&d.exists){var x=d.data()||{},ch=false;if(x.body&&x.body!==SMS.fil){SMS.fil=x.body;ch=true}if(x.en&&x.en!==SMS.en){SMS.en=x.en;ch=true}if(ch)render()}}).catch(function(){})}catch(e){}
@@ -911,6 +940,77 @@ function loadAdmin(){
 $('adminBtn').onclick=openAdmin;$('retry').onclick=openAdmin;$('back').onclick=function(){if(unsub){unsub();unsub=null}show('form')};$('lock').onclick=lockAdmin;
 var fp=$('fpos');
 $('q').oninput=render;fp.onchange=render;
+
+/* ===== Admin: notification sa bagong aplikasyon ===== */
+var NT=[['chime','Chime (ding-dong)'],['bell','Bell'],['beep','Beep-beep'],['pop','Pop'],['doorbell','Doorbell'],['soft','Soft'],['alarm','Alarm (malakas)'],['off','Walang tunog']];
+function lsg(k,d){try{var v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}}
+function lss(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+var NS={tone:lsg('rf-ntone','chime'),vol:Math.min(1,Math.max(0,parseFloat(lsg('rf-nvol','0.7'))||0.7)),sys:lsg('rf-nsys','0')==='1'},AC=null,SEEN=null,NUNREAD=0,TITLE0=document.title;
+function actx(){try{if(!AC){var C=window.AudioContext||window.webkitAudioContext;if(C)AC=new C()}if(AC&&AC.state==='suspended')AC.resume()}catch(e){}return AC}
+['click','keydown','touchstart'].forEach(function(ev){document.addEventListener(ev,function(){if(AC&&AC.state==='suspended')actx()},{passive:true})});
+function nt(c,t,f,d,type,g){var o=c.createOscillator(),a=c.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t);a.gain.setValueAtTime(0.0001,t);a.gain.exponentialRampToValueAtTime(Math.max(0.0002,g),t+0.015);a.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(a);a.connect(c.destination);o.start(t);o.stop(t+d+0.05)}
+function playTone(name){
+  var c=actx();if(!c||name==='off')return;var t=c.currentTime+0.03,g=NS.vol*0.6,i;
+  if(name==='chime'){nt(c,t,784,0.7,'sine',g);nt(c,t+0.25,587,1.0,'sine',g)}
+  else if(name==='bell'){nt(c,t,660,1.6,'sine',g);nt(c,t,1320,1.2,'sine',g*0.4);nt(c,t,1980,0.8,'sine',g*0.2)}
+  else if(name==='beep'){for(i=0;i<3;i++)nt(c,t+i*0.2,1000,0.1,'square',g*0.5)}
+  else if(name==='pop'){nt(c,t,1200,0.09,'sine',g);nt(c,t+0.1,1700,0.14,'sine',g)}
+  else if(name==='doorbell'){nt(c,t,659,0.6,'triangle',g);nt(c,t+0.4,523,1.1,'triangle',g)}
+  else if(name==='soft'){[523,659,784].forEach(function(f,k){nt(c,t+k*0.28,f,0.7,'sine',g*0.8)})}
+  else if(name==='alarm'){for(i=0;i<6;i++)nt(c,t+i*0.18,i%2?660:880,0.16,'square',g*0.45)}
+}
+function toast(list){
+  var old=document.getElementById('ntoast');if(old)old.remove();
+  var f=list[0],el=document.createElement('div');el.id='ntoast';el.setAttribute('role','status');
+  el.style.cssText='position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:14px;left:14px;max-width:380px;margin-left:auto;z-index:300;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--grn);border-radius:14px;padding:14px 16px;box-shadow:0 20px 40px -16px rgba(22,39,95,.55);cursor:pointer';
+  var h=document.createElement('b');h.textContent='🔔 '+(list.length>1?list.length+' bagong aplikasyon':'Bagong aplikasyon');
+  var d=document.createElement('div');d.style.cssText='font-size:.9rem;color:var(--mute);margin-top:4px';
+  d.textContent=list.length>1?list.map(function(r){return r.name||'(walang pangalan)'}).slice(0,3).join(', ')+(list.length>3?'…':''):(f.name||'(walang pangalan)')+' · '+(f.position||'');
+  el.append(h,d);
+  el.onclick=function(){el.remove();OPEN={};if(list.length===1)OPEN[f.id]=true;FOLDER='';showTab('a');render();window.scrollTo(0,0)};
+  document.body.appendChild(el);setTimeout(function(){if(el.parentNode)el.remove()},9000);
+}
+function badge(n){NUNREAD+=n;document.title='🔔 ('+NUNREAD+') Bagong aplikasyon'}
+function clearBadge(){if(NUNREAD){NUNREAD=0;document.title=TITLE0}}
+window.addEventListener('focus',clearBadge);document.addEventListener('visibilitychange',function(){if(!document.hidden)clearBadge()});
+function notifyNew(list){
+  playTone(NS.tone);toast(list);
+  if(document.hidden)badge(list.length);
+  if(NS.sys&&window.Notification&&Notification.permission==='granted'&&document.hidden){
+    try{var f=list[0],n=new Notification(list.length>1?list.length+' bagong aplikasyon':'Bagong aplikasyon',{body:list.length>1?'May bagong natanggap na aplikasyon.':(f.name||'')+' · '+(f.position||''),tag:'rf-newapp'});n.onclick=function(){window.focus();n.close()}}catch(e){}
+  }
+}
+function checkNew(){
+  if(SEEN===null){SEEN={};rows.forEach(function(r){SEEN[r.id]=1});return}
+  var nw=rows.filter(function(r){return !SEEN[r.id]});rows.forEach(function(r){SEEN[r.id]=1});
+  if(nw.length)notifyNew(nw);
+}
+function renderNot(){
+  var box=$('tabNot');box.textContent='';
+  var c=mk('div','card'),hh=mk('div','h');hh.appendChild(mk('b','','Notification para sa bagong aplikasyon'));c.appendChild(hh);
+  var det=mk('div','det');
+  var w1=mk('div');w1.appendChild(mk('span','','Tunog'));
+  var sel=mk('select');NT.forEach(function(o){var op=mk('option','',o[1]);op.value=o[0];if(o[0]===NS.tone)op.selected=true;sel.appendChild(op)});
+  sel.onchange=function(){NS.tone=sel.value;lss('rf-ntone',NS.tone);playTone(NS.tone)};w1.appendChild(sel);
+  var w2=mk('div');w2.appendChild(mk('span','','Lakas ng tunog'));
+  var rg=mk('input');rg.type='range';rg.min='0.1';rg.max='1';rg.step='0.05';rg.value=String(NS.vol);rg.style.cssText='width:100%;padding:0';
+  rg.onchange=function(){NS.vol=parseFloat(rg.value);lss('rf-nvol',String(NS.vol));playTone(NS.tone)};
+  rg.oninput=function(){NS.vol=parseFloat(rg.value)};w2.appendChild(rg);
+  var w3=mk('div','acts');var tb=mk('button','ghost','▶ Subukan ang tunog');tb.type='button';tb.onclick=function(){playTone(NS.tone)};w3.appendChild(tb);
+  var w4=mk('div');var lb=mk('label','opt'),cb=mk('input');cb.type='checkbox';cb.checked=!!(NS.sys&&window.Notification&&Notification.permission==='granted');
+  var msg=mk('span','sm','');msg.style.cssText='display:block;margin-top:6px';
+  if(!window.Notification){cb.disabled=true;msg.textContent='Hindi suportado ng browser na ito ang pop-up notification.'}
+  cb.onchange=function(){
+    if(!cb.checked){NS.sys=false;lss('rf-nsys','0');msg.textContent='';return}
+    Notification.requestPermission().then(function(p){
+      if(p==='granted'){NS.sys=true;lss('rf-nsys','1');msg.textContent='';try{new Notification('Naka-on na ang notification',{body:'Makakatanggap ka ng alert kapag may bagong aplikasyon.'})}catch(e){}}
+      else{cb.checked=false;NS.sys=false;lss('rf-nsys','0');msg.textContent='Naka-block ang notification sa browser. Payagan ito sa site settings, tapos subukan muli.'}
+    });
+  };
+  lb.append(cb,mk('span','','Magpakita rin ng pop-up notification ng browser kapag nasa ibang tab o window ang admin'));w4.append(lb,msg);
+  var w5=mk('p','cnt','Gumagana ang notification habang nakabukas ang admin page (kahit nasa ibang tab). Hindi ito gagana kapag sarado na ang page o naka-lock ang phone. Kapag walang tunog sa unang bukas, pindutin muna kahit saan sa page para payagan ng browser ang audio.');
+  det.append(w1,w2,w3,w4,w5);c.appendChild(det);box.appendChild(c);
+}
 var ST=['Bago','Na-review','Para sa Interview','Qualified','Hindi Qualified'];
 var OPEN={},NOTE='',FOLDER='';
 var HRMAP={'Qualified for Initial Interview':'Qualified','For Further Assessment':'Na-review','Not Qualified':'Hindi Qualified'};
@@ -1171,7 +1271,7 @@ function smsPanel(r){
 }
 /* ===== Admin: English / Tagalog ===== */
 (function(){
-var D={'I-print':'Print','I. Pangkalahatang Impormasyon':'I. General Information','II. Impormasyon sa Pagtatrabaho':'II. Employment Information','III. Position na Inaaplayan':'III. Position Applied For','V. Mga Dokumentong Maaaring Isumite':'V. Documents','Iba pang Impormasyon':'Other Information','Ipadala ang text message':'Send text message','Ipadala ulit ang text message':'Resend text message','Tandaan ako sa device na ito':'Remember me on this device','Mag-login gamit ang admin email at password.':'Log in with the admin email and password.','Ilagay ang email at password.':'Enter your email and password.','Maling email o password. Subukan muli.':'Wrong email or password. Try again.','Hindi admin ang account na ito.':'This account is not an admin.','Hindi makakonekta sa Supabase.':'Could not connect to Supabase.','Template ng SMS':'SMS template','Template ng SMS para sa Qualified':'SMS template for Qualified applicants','Ito ang mensaheng ipapadala sa aplikanteng Qualified. Ang petsa at oras ay pipiliin ng HR staff sa bawat aplikante. Mga puwedeng gamitin: {pangalan} {position} {petsa} {oras}':'This is the message sent to Qualified applicants. HR staff picks the date and time for each applicant. You can use: {pangalan} (name) {position} {petsa} (date) {oras} (time)','Mensahe':'Message','I-save ang template':'Save template','Ibalik sa default':'Reset to default','Mag-text sa aplikante':'Text the applicant','Petsa ng interview':'Interview date','Oras ng interview':'Interview time','Buksan sa Messages':'Open in Messages','Kopyahin ang mensahe':'Copy message','Piliin muna ang petsa at oras.':'Choose a date and time first.','Walang valid na contact number ang aplikante.':'The applicant has no valid contact number.','Na-copy ang mensahe.':'Message copied.','Hindi ma-copy. Piliin at kopyahin mano-mano.':'Could not copy. Select and copy it manually.','Na-save ang template.':'Template saved.','Hindi na-save ang template. Subukan muli.':'Could not save the template. Try again.','Lahat ay naiuri na sa Qualified o Hindi Qualified.':'All applicants have been sorted into Qualified or Not Qualified.','Mga Aplikasyon':'Applications','Mag-logout':'Log out','Bumalik sa form':'Back to form','Mga Position at Tanong':'Positions and Questions','← Bumalik sa mga aplikasyon':'← Back to applications','Sinusuri ang iyong access…':'Checking your access…','Para lang ito sa admin. Mag-sign in sa claude.ai gamit ang admin account, pagkatapos ay subukan muli.':'This is for admins only. Sign in to claude.ai with the admin account, then try again.','Hindi mabasa ang admin settings. Subukan muli.':'Could not read admin settings. Try again.','Ilagay ang admin password para makita ang mga aplikasyon.':'Enter the admin password to view applications.','Unang beses ito. Gumawa ng admin password (hindi bababa sa 8 characters).':'First time here. Create an admin password (at least 8 characters).','Dapat hindi bababa sa 8 characters ang password.':'Password must be at least 8 characters.','Hindi magkapareho ang dalawang password.':'The two passwords do not match.','Maling password. Subukan muli.':'Wrong password. Try again.','May error. Subukan muli.':'Something went wrong. Try again.','Hindi suportado ng browser na ito ang secure login.':'This browser does not support secure login.','Ulitin ang password':'Repeat password','Mag-login':'Log in','Gawin ang password':'Create password','Subukan muli':'Try again','Maghanap ng pangalan o contact':'Search by name or contact','Lahat ng position':'All positions','I-download ang CSV':'Download CSV','Lahat':'All','Bago':'New','Na-review':'Reviewed','Para sa Interview':'For Interview','Hindi Qualified':'Not Qualified','Wala pang assessment':'No assessment yet','Piliin ang status':'Choose status','Wala pang aplikante sa folder na ito.':'No applicants in this folder yet.','Walang tugma sa hinahanap.':'No results match your search.','Wala pang nagsusumite.':'No submissions yet.','Matagal ang pag-load. Subukan muli.':'Loading is taking long. Try again.','Hindi mabasa ang mga aplikasyon. Admin lang ang may access.':'Could not read applications. Admin access only.','(walang pangalan)':'(no name)','Tingnan ang sagot':'View answers','Itago':'Hide','I-unhide':'Unhide','Isara ang mga nakatago':'Close hidden list','Mga nakatago':'Hidden applications','Sigurado? Pindutin ulit':'Sure? Tap again','⬇ I-download':'⬇ Download','Ide-download…':'Downloading…','Hindi ma-download':'Could not download','PARA SA HR DEPARTMENT LAMANG':'FOR HR DEPARTMENT ONLY','I-save ang Assessment':'Save assessment','Pumili muna ng assessment.':'Please choose an assessment first.','Sine-save…':'Saving…','Hindi na-save. Subukan muli.':'Could not save. Try again.','Baguhin ang mga tanong':'Edit questions','Burahin':'Delete','Tanong':'Question','Mga pagpipilian (isa bawat linya)':'Options (one per line)','Lagyan ng pangalan ang position.':'Enter a name for the position.','Mga Na-upload na File':'Uploaded files','Position na Inaaplayan':'Position Applied For','Larawan ng aplikante':'Applicant photo','Sigurado? Burahin nang tuluyan':'Sure? Delete permanently','Burahin ang tanong':'Delete question','Hindi nabura.':'Could not delete.','I-disable (itago sa form)':'Disable (hide from form)','I-enable':'Enable','Kanselahin':'Cancel','Na-save.':'Saved.','Gawing editable ang mga default':'Make defaults editable','Magdagdag ng position':'Add position','Magdagdag ng tanong':'Add question','Mahabang sagot':'Long answer','Maikling sagot':'Short answer','May tanong na walang laman. Punan o burahin ito.':'A question is empty. Fill it in or delete it.','Naka-disable':'Disabled','Pamagat ng bahagi (walang sagot)':'Section heading (no answer)','Pamagat ng bahagi':'Section heading','Pangalan ng position':'Position name','Pangalan ng bagong position':'New position name','Pumili ng isa o higit pa':'Choose one or more','Pumili ng isa':'Choose one','Kailangang sagutan':'Required','Handa na. Puwede mo nang baguhin ang mga position.':'Ready. You can now edit the positions.','I-save':'Save','Wala pang position. Magdagdag sa itaas.':'No positions yet. Add one above.','Ang mga naka-enable na position lang ang makikita ng applicant sa form. Kapag dinisable, mawawala ito sa form pero mananatili ang mga lumang aplikasyon.':'Only enabled positions are shown to applicants on the form. A disabled position disappears from the form, but old applications are kept.','Hindi pa naka-set ang mga position, kaya ang tatlong default ang lumalabas sa form. Para mabago, idisable o mapalitan ang mga ito, pindutin ito:':'Positions are not set yet, so the three defaults appear on the form. To disable or change them, press this:'};
+var D={'I-print':'Print','I. Pangkalahatang Impormasyon':'I. General Information','II. Impormasyon sa Pagtatrabaho':'II. Employment Information','III. Position na Inaaplayan':'III. Position Applied For','V. Mga Dokumentong Maaaring Isumite':'V. Documents','Iba pang Impormasyon':'Other Information','Ipadala ang text message':'Send text message','Ipadala ulit ang text message':'Resend text message','Tandaan ako sa device na ito':'Remember me on this device','Mag-login gamit ang admin email at password.':'Log in with the admin email and password.','Ilagay ang email at password.':'Enter your email and password.','Maling email o password. Subukan muli.':'Wrong email or password. Try again.','Hindi admin ang account na ito.':'This account is not an admin.','Hindi makakonekta sa Supabase.':'Could not connect to Supabase.','Template ng SMS':'SMS template','Template ng SMS para sa Qualified':'SMS template for Qualified applicants','Ito ang mensaheng ipapadala sa aplikanteng Qualified. Ang petsa at oras ay pipiliin ng HR staff sa bawat aplikante. Mga puwedeng gamitin: {pangalan} {position} {petsa} {oras}':'This is the message sent to Qualified applicants. HR staff picks the date and time for each applicant. You can use: {pangalan} (name) {position} {petsa} (date) {oras} (time)','Mensahe':'Message','I-save ang template':'Save template','Ibalik sa default':'Reset to default','Mag-text sa aplikante':'Text the applicant','Petsa ng interview':'Interview date','Oras ng interview':'Interview time','Buksan sa Messages':'Open in Messages','Kopyahin ang mensahe':'Copy message','Piliin muna ang petsa at oras.':'Choose a date and time first.','Walang valid na contact number ang aplikante.':'The applicant has no valid contact number.','Na-copy ang mensahe.':'Message copied.','Hindi ma-copy. Piliin at kopyahin mano-mano.':'Could not copy. Select and copy it manually.','Na-save ang template.':'Template saved.','Hindi na-save ang template. Subukan muli.':'Could not save the template. Try again.','Lahat ay naiuri na sa Qualified o Hindi Qualified.':'All applicants have been sorted into Qualified or Not Qualified.','Mga Aplikasyon':'Applications','Mag-logout':'Log out','Bumalik sa form':'Back to form','Mga Position at Tanong':'Positions and Questions','← Bumalik sa mga aplikasyon':'← Back to applications','Sinusuri ang iyong access…':'Checking your access…','Para lang ito sa admin. Mag-sign in sa claude.ai gamit ang admin account, pagkatapos ay subukan muli.':'This is for admins only. Sign in to claude.ai with the admin account, then try again.','Hindi mabasa ang admin settings. Subukan muli.':'Could not read admin settings. Try again.','Ilagay ang admin password para makita ang mga aplikasyon.':'Enter the admin password to view applications.','Unang beses ito. Gumawa ng admin password (hindi bababa sa 8 characters).':'First time here. Create an admin password (at least 8 characters).','Dapat hindi bababa sa 8 characters ang password.':'Password must be at least 8 characters.','Hindi magkapareho ang dalawang password.':'The two passwords do not match.','Maling password. Subukan muli.':'Wrong password. Try again.','May error. Subukan muli.':'Something went wrong. Try again.','Hindi suportado ng browser na ito ang secure login.':'This browser does not support secure login.','Ulitin ang password':'Repeat password','Mag-login':'Log in','Gawin ang password':'Create password','Subukan muli':'Try again','Maghanap ng pangalan o contact':'Search by name or contact','Lahat ng position':'All positions','I-download ang CSV':'Download CSV','Lahat':'All','Bago':'New','Na-review':'Reviewed','Para sa Interview':'For Interview','Hindi Qualified':'Not Qualified','Wala pang assessment':'No assessment yet','Piliin ang status':'Choose status','Wala pang aplikante sa folder na ito.':'No applicants in this folder yet.','Walang tugma sa hinahanap.':'No results match your search.','Wala pang nagsusumite.':'No submissions yet.','Matagal ang pag-load. Subukan muli.':'Loading is taking long. Try again.','Hindi mabasa ang mga aplikasyon. Admin lang ang may access.':'Could not read applications. Admin access only.','(walang pangalan)':'(no name)','Tingnan ang sagot':'View answers','Itago':'Hide','I-unhide':'Unhide','Isara ang mga nakatago':'Close hidden list','Mga nakatago':'Hidden applications','Sigurado? Pindutin ulit':'Sure? Tap again','Notification para sa bagong aplikasyon':'New application notification','Tunog':'Sound','Lakas ng tunog':'Volume','▶ Subukan ang tunog':'▶ Test sound','Walang tunog':'No sound','Alarm (malakas)':'Alarm (loud)','⬇ I-download':'⬇ Download','Ide-download…':'Downloading…','Hindi ma-download':'Could not download','PARA SA HR DEPARTMENT LAMANG':'FOR HR DEPARTMENT ONLY','I-save ang Assessment':'Save assessment','Pumili muna ng assessment.':'Please choose an assessment first.','Sine-save…':'Saving…','Hindi na-save. Subukan muli.':'Could not save. Try again.','Baguhin ang mga tanong':'Edit questions','Burahin':'Delete','Tanong':'Question','Mga pagpipilian (isa bawat linya)':'Options (one per line)','Lagyan ng pangalan ang position.':'Enter a name for the position.','Mga Na-upload na File':'Uploaded files','Position na Inaaplayan':'Position Applied For','Larawan ng aplikante':'Applicant photo','Sigurado? Burahin nang tuluyan':'Sure? Delete permanently','Burahin ang tanong':'Delete question','Hindi nabura.':'Could not delete.','I-disable (itago sa form)':'Disable (hide from form)','I-enable':'Enable','Kanselahin':'Cancel','Na-save.':'Saved.','Gawing editable ang mga default':'Make defaults editable','Magdagdag ng position':'Add position','Magdagdag ng tanong':'Add question','Mahabang sagot':'Long answer','Maikling sagot':'Short answer','May tanong na walang laman. Punan o burahin ito.':'A question is empty. Fill it in or delete it.','Naka-disable':'Disabled','Pamagat ng bahagi (walang sagot)':'Section heading (no answer)','Pamagat ng bahagi':'Section heading','Pangalan ng position':'Position name','Pangalan ng bagong position':'New position name','Pumili ng isa o higit pa':'Choose one or more','Pumili ng isa':'Choose one','Kailangang sagutan':'Required','Handa na. Puwede mo nang baguhin ang mga position.':'Ready. You can now edit the positions.','I-save':'Save','Wala pang position. Magdagdag sa itaas.':'No positions yet. Add one above.','Ang mga naka-enable na position lang ang makikita ng applicant sa form. Kapag dinisable, mawawala ito sa form pero mananatili ang mga lumang aplikasyon.':'Only enabled positions are shown to applicants on the form. A disabled position disappears from the form, but old applications are kept.','Hindi pa naka-set ang mga position, kaya ang tatlong default ang lumalabas sa form. Para mabago, idisable o mapalitan ang mga ito, pindutin ito:':'Positions are not set yet, so the three defaults appear on the form. To disable or change them, press this:'};
 function S(x){return D[x]||x}
 var RX=[[/^Kailangan ng hindi bababa sa 2 pagpipilian: (.+)$/,function(m){return 'At least 2 options are required: '+m[1]}],[/^Ipakita ang mga nakatago \((\d+)\)$/,function(m){return 'Show hidden ('+m[1]+')'}],[/^Isinumite noong (.+)$/,function(m){return 'Submitted on '+m[1]}],[/^✓ (?:Naipadala|Binuksan sa Messages) noong (.+)$/,function(m){return '✓ Opened in Messages on '+m[1]}],[/^May error\. Subukan muli\. \((.*)\)$/,function(m){return 'Something went wrong. Try again. ('+m[1]+')'}],[/^Binuksan sa Messages noong (.+)$/,function(m){return 'Opened in Messages on '+m[1]}],[/^(\d+) aplikasyon sa folder na (.+)$/,function(m){return m[1]+(m[1]==1?' application':' applications')+' in folder '+S(m[2])}],[/^(\d+) aplikasyon$/,function(m){return m[1]+(m[1]==1?' application':' applications')}],[/^(\d+) tanong$/,function(m){return m[1]+(m[1]==1?' question':' questions')}],[/^✓ Na-update ang status ni (.+): (.+)$/,function(m){return '✓ Status updated for '+m[1]+': '+S(m[2])}],[/^✓ Na-save · status: (.+)$/,function(m){return '✓ Saved · status: '+S(m[1])}],[/^Huling na-save: (.+)$/,function(m){return 'Last saved: '+m[1]}],[/^(📁|📂) (.+)$/,function(m){return m[1]+' '+S(m[2])}]];
 function tr(s){var t=s.trim();if(!t)return s;var o=D[t];if(o===undefined&&typeof EN!=='undefined'&&EN[t])o=EN[t];if(o===undefined){for(var i=0;i<RX.length;i++){var m=t.match(RX[i][0]);if(m){o=RX[i][1](m);break}}}if(o===undefined)return s;return s.match(/^\s*/)[0]+o+s.match(/\s*$/)[0]}
