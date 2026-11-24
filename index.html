@@ -207,6 +207,63 @@ select{appearance:none;-webkit-appearance:none;padding-right:42px;background-ima
   #printArea .rec .rh h4{color:#000}
 }
 @media(max-width:560px){.top .in{flex-wrap:wrap;row-gap:8px}.tt{flex:1 1 calc(100% - 70px);min-width:0}.tt b{font-size:.95rem}.top .in .lang{margin-right:auto}.top #adminBtn{padding:7px 14px;font-size:.82rem}}
+/* ===== Elegant applicant form ===== */
+.top,#viewForm{--navy:#16275f;--gold:#c9961a;--serif:"Fraunces",Georgia,"Times New Roman",serif}
+body:has(#viewAdmin.hidden){background:linear-gradient(180deg,#f2f5fb 0,#fafaf8 460px) fixed}
+.top{background:#fff;border-bottom:0;box-shadow:0 1px 0 var(--line)}
+.top::after{content:"";display:block;height:3px;background:linear-gradient(90deg,transparent,var(--gold) 18%,var(--gold) 82%,transparent);opacity:.9}
+.top .in{padding:14px 20px}
+.tt b{font-family:var(--serif);font-weight:600;font-size:1.15rem;letter-spacing:.005em;color:var(--navy)}
+.tt span{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--mute)}
+.lang{border-radius:99px;padding:3px;gap:2px;background:#fff;border:1px solid var(--line)}
+.lang button{border-radius:99px;padding:6px 15px;font-weight:600}
+.lang button[aria-pressed=true]{background:var(--navy);box-shadow:0 4px 10px -4px rgba(22,39,95,.6)}
+.top #adminBtn{border-radius:99px;border:1px solid var(--line);color:var(--navy);font-weight:600;background:#fff;padding:9px 20px}
+.top #adminBtn:hover{border-color:var(--navy);background:var(--tint)}
+#viewForm .intro{position:relative;overflow:hidden;background:linear-gradient(135deg,#16275f 0%,#2646a8 100%);border:0;border-radius:22px;padding:32px 32px 30px;box-shadow:0 26px 44px -28px rgba(22,39,95,.75)}
+#viewForm .intro::before{content:"";position:absolute;right:-70px;top:-70px;width:220px;height:220px;border-radius:50%;border:1px solid rgba(201,150,26,.5)}
+#viewForm .intro::after{content:"";position:absolute;right:-26px;top:-26px;width:124px;height:124px;border-radius:50%;border:1px solid rgba(201,150,26,.32)}
+#viewForm .intro h1{position:relative;font-family:var(--serif);font-weight:600;font-size:1.9rem;letter-spacing:-.01em;color:#fff;margin:0 0 14px}
+#viewForm .intro h1::after{content:"";display:block;width:52px;height:2px;margin-top:14px;background:var(--gold)}
+#viewForm .intro p{position:relative;max-width:62ch;color:rgba(255,255,255,.84);font-size:.97rem;line-height:1.65}
+#viewForm section{border:1px solid #e6eaf3;border-radius:20px;padding:30px 30px 12px;box-shadow:0 20px 38px -30px rgba(22,39,95,.5)}
+#viewForm section h2{position:relative;font-family:var(--serif);font-weight:600;font-size:1.32rem;letter-spacing:-.005em;color:var(--navy);margin:0 0 26px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+#viewForm section h2::before{display:none}
+#viewForm section h2::after{content:"";position:absolute;left:0;bottom:-1px;width:56px;height:2px;background:var(--gold)}
+#viewForm section .note{background:#f6f8fd;border-left:3px solid var(--gold);border-radius:10px;color:#56627c}
+#viewForm h3{font-family:var(--serif);font-weight:600;font-size:1.04rem;color:var(--navy)}
+#viewForm .f>label,#viewForm .f>.q{font-weight:600;font-size:.9rem;color:#2a3550;letter-spacing:.005em;margin-bottom:9px}
+#viewForm input[type=text],#viewForm input[type=number],#viewForm input[type=email],#viewForm input[type=tel],#viewForm input[type=date],#viewForm select,#viewForm textarea{background-color:#fbfcfe;border:1.5px solid #dde3ef;border-radius:12px;padding:13px 15px}
+#viewForm input:focus,#viewForm select:focus,#viewForm textarea:focus{background-color:#fff;border-color:var(--navy);box-shadow:0 0 0 4px rgba(22,39,95,.1)}
+#viewForm .phone .pre{border-color:#dde3ef;background:#f1f4fb;color:var(--navy)}
+#viewForm .phone.bad .pre,#viewForm .phone.bad input{border-color:var(--err)}
+#viewForm .opt{border-color:#dde3ef;border-radius:12px;background:#fff}
+#viewForm .opt:hover{border-color:#9aa9d6}
+#viewForm .opt:has(input:checked){background:#f3f6fd;border-color:var(--navy);box-shadow:inset 3px 0 0 var(--gold)}
+#viewForm .opt input[type=radio],#viewForm .opt input[type=checkbox]{accent-color:var(--navy)}
+#viewForm .pos .opt{border-top:4px solid var(--c,#dde3ef)}
+#viewForm .pos .opt:has(input:checked){border-color:var(--c);box-shadow:0 12px 24px -16px var(--c)}
+#viewForm button{border-radius:12px;padding:13px 28px;font-weight:600;letter-spacing:.01em;border-color:var(--navy);background:linear-gradient(180deg,#2d4fbf,var(--navy));box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 1px 2px rgba(22,39,95,.28)}
+#viewForm button:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 10px 20px -12px rgba(22,39,95,.65)}
+#viewForm button.alt{background:#fff;color:var(--navy);border-color:rgba(22,39,95,.28);box-shadow:none}
+#viewForm button.alt:hover{background:var(--tint);border-color:var(--navy)}
+#viewForm button.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);padding:8px 16px;box-shadow:none}
+#viewForm button.ghost:hover{background:var(--tint);border-color:#9aa9d6}
+#viewForm button:disabled{opacity:.5}
+@media(max-width:520px){#viewForm .intro{padding:24px 20px 22px;border-radius:18px}#viewForm .intro h1{font-size:1.5rem}#viewForm section{padding:22px 16px 6px;border-radius:16px}#viewForm section h2{font-size:1.18rem}.top .in{padding:10px 14px}.tt b{font-size:1rem}}
+#subOv{position:fixed;inset:0;z-index:260;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(14,22,50,.55);backdrop-filter:blur(3px)}
+#subOv.hidden{display:none!important}
+#subOv .sbox{background:#fff;border-radius:24px;padding:36px 30px 28px;max-width:400px;width:100%;text-align:center;box-shadow:0 40px 80px -30px rgba(14,22,50,.7);border-top:4px solid #c9961a}
+#subOv .ic{width:76px;height:76px;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:2.4rem;font-weight:700;color:#fff}
+#subOv .ic.ok{background:var(--grn);box-shadow:0 14px 26px -12px var(--grn);animation:subpop .35s ease-out}
+#subOv .ic.spin{border:5px solid var(--line);border-top-color:#16275f;animation:subspin .8s linear infinite}
+#subOv h2{margin:0 0 8px;font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:1.4rem;color:#16275f}
+#subOv p{margin:0 0 20px;color:var(--mute);font-size:.95rem}
+#subOv .btns{justify-content:center}
+@keyframes subspin{to{transform:rotate(360deg)}}
+@keyframes subpop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){#subOv .ic{animation:none!important}}
+#viewForm input[readonly]{background-color:#f1f4fb;color:var(--navy);font-weight:600;cursor:default}
 </style>
 </head>
 <body>
@@ -239,6 +296,7 @@ select{appearance:none;-webkit-appearance:none;padding-right:42px;background-ima
 </div>
 </div>
 </div>
+<div id="subOv" class="hidden" role="dialog" aria-modal="true" aria-live="polite"><div class="sbox"><div class="ic" id="subIc"></div><h2 id="subT"></h2><p id="subM"></p><div class="btns" id="subB"><button type="button" id="subOk"></button></div></div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 // t: text|number|email|tel|date|area|radio|check|h(subheading). r: required. o: options ("Iba pa" adds text box)
@@ -317,7 +375,7 @@ var DEFPOS=POS;
 var DOCS=[{t:'check',n:'docs',l:'Mga dokumentong maaaring isumite',o:['Updated Resume / Biodata','Photocopy ng Valid ID','Certificate of Employment (kung mayroon)','Transcript of Records / Diploma (kung mayroon)','NBI Clearance (kung mayroon)','SSS','Pag-IBIG','PhilHealth','TIN','Iba pa:']}];
 
 
-var EN={"Malabo ang larawan. Mag-retake o mag-upload ng mas malinaw na larawan.":"The photo is blurry. Please retake it or upload a clearer photo.","Malabo ang larawan. Hawakan nang steady, siguraduhing maliwanag, at kunan muli.":"The photo is blurry. Hold the device steady, make sure there is good light, and take it again.","Kumuha ng larawan":"Take photo","Kunan":"Capture","Kanselahin":"Cancel","Ilagay ang dokumento sa loob ng frame at siguraduhing malinaw.":"Place the document inside the frame and make sure it is clear.",
+var EN={"Malabo ang larawan. Mag-retake o mag-upload ng mas malinaw na larawan.":"The photo is blurry. Please retake it or upload a clearer photo.","Malabo ang larawan. Hawakan nang steady, siguraduhing maliwanag, at kunan muli.":"The photo is blurry. Hold the device steady, make sure there is good light, and take it again.","Matagumpay na naisumite!":"Successfully submitted!","OK":"OK","Kumuha ng larawan":"Take photo","Kunan":"Capture","Kanselahin":"Cancel","Ilagay ang dokumento sa loob ng frame at siguraduhing malinaw.":"Place the document inside the frame and make sure it is clear.",
 "Mangyaring sagutan nang tama at kumpleto ang mga sumusunod na impormasyon. Ang mga ito ay gagamitin ng HR Department para sa paunang pagsusuri ng inyong aplikasyon.":"Please answer the following information accurately and completely. It will be used by the HR Department for the initial review of your application.",
 "Isumite ang aplikasyon":"Submit application","I-clear lahat":"Clear all","Nakumpleto ang form":"Form completed","I-download (.txt)":"Download (.txt)","I-print":"Print",
 "Isinusumite ang aplikasyon…":"Submitting your application…",
@@ -536,6 +594,7 @@ function isSharp(file,min){
     img.onerror=function(){URL.revokeObjectURL(u);res(true)};img.src=u;
   });
 }
+function fillDate(){var e=form.elements.petsa;if(e){e.value=todayStr();e.readOnly=true}}
 function ageFrom(v){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v||'');if(!m)return null;var t=new Date(),a=t.getFullYear()-(+m[1]);if(t.getMonth()+1<+m[2]||(t.getMonth()+1===+m[2]&&t.getDate()<+m[3]))a--;return a}
 function todayStr(){var t=new Date();return t.getFullYear()+'-'+('0'+(t.getMonth()+1)).slice(-2)+'-'+('0'+t.getDate()).slice(-2)}
 function openDocCam(doc,u,pc){
@@ -596,7 +655,7 @@ function setLang(l,first){
   lang=l;document.documentElement.lang=l==='en'?'en':'fil';
   build();
   if(snap){[].filter.call(form.elements,isF).forEach(function(e){var k=sk(e);if(!(k in snap))return;if(e.type==='radio'||e.type==='checkbox')e.checked=snap[k];else e.value=snap[k]})}
-  sync();renderUps();
+  fillDate();sync();renderUps();
   document.querySelectorAll('[data-tl]').forEach(function(el){el.textContent=T(el.dataset.tl)});
   document.querySelectorAll('.lb').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.l===l?'true':'false')});
   document.getElementById('err').classList.add('hidden');
@@ -622,7 +681,7 @@ form.addEventListener('change',function(e){if(e.target.name==='bday'){var a=ageF
 form.addEventListener('input',function(e){var t=e.target;if(t.id==='contact'){var v=t.value.replace(/\D/g,'').replace(/^(63|0)/,'').slice(0,10);if(v!==t.value)t.value=v;checkContact(false)}});
 form.addEventListener('focusout',function(e){if(e.target.id==='contact')checkContact(true)});
 form.addEventListener('focusin',function(e){var t=e.target;if(t.classList&&t.classList.contains('oth')){var c=t.parentNode.querySelector('input[type=radio],input[type=checkbox]');if(c&&!c.checked)c.click()}});
-form.addEventListener('reset',function(){FILES={};ERR={};setTimeout(renderUps,0);photoData=null;if(stream)stopCam();setTimeout(renderPhoto,0);setTimeout(sync,0);document.getElementById('done').classList.add('hidden')});
+form.addEventListener('reset',function(){setTimeout(fillDate,0);FILES={};ERR={};setTimeout(renderUps,0);photoData=null;if(stream)stopCam();setTimeout(renderPhoto,0);setTimeout(sync,0);document.getElementById('done').classList.add('hidden')});
 document.querySelectorAll('[data-tl]').forEach(function(el){el.dataset.tl=el.textContent});
 document.querySelectorAll('.lb').forEach(function(b){b.onclick=function(){setLang(b.dataset.l)}});
 var savedLang='';try{savedLang=localStorage.getItem('rf-lang')||''}catch(e){}
@@ -663,7 +722,7 @@ function val(name){
   return out;
 }
 form.addEventListener('submit',function(ev){
-  ev.preventDefault();
+  ev.preventDefault();fillDate();
   var err=document.getElementById('err'),miss=[],first=null;
   app.querySelectorAll('[data-req]').forEach(function(el){
     var sec=el.closest('section'),f=el.closest('.f');
@@ -697,9 +756,14 @@ form.addEventListener('submit',function(ev){
   var txt=lines.join('\n');
   var ans={};keys.forEach(function(k){var v=val(k);if(k==='posisyon'&&POS[p])v=[POS[p].label];if(v.length)ans[LAB[k]]=v.join(', ')});
   if(fl.length)ans['Mga Na-upload na File']=fl.map(function(x){return x.doc.replace(/:$/,'')+' – '+x.name}).join('; ');
-  saveApp({id:(window.crypto&&crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2)),submittedAt:Date.now(),status:'Bago',name:fullName(),contact:val('contact')[0]||'',position:POS[p]?POS[p].label:'Iba pa',photo:photoData,files:fl,ans:ans});
+  var payload=({id:(window.crypto&&crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2)),submittedAt:Date.now(),status:'Bago',name:fullName(),contact:val('contact')[0]||'',position:POS[p]?POS[p].label:'Iba pa',photo:photoData,files:fl,ans:ans});
   document.getElementById('result').textContent=txt;
-  var d=document.getElementById('done');d.classList.remove('hidden');d.scrollIntoView({behavior:'smooth'});
+  var d=document.getElementById('done');d.classList.add('hidden');$('copyBox').classList.add('hidden');
+  showSub('busy');
+  saveApp(payload).then(function(ok){
+    if(ok){showSub('ok')}
+    else{hideSub();$('copyBox').classList.remove('hidden');$('saveMsg').textContent=T('Hindi naipadala ang aplikasyon sa HR. I-download ang kopya sa ibaba at ibigay sa HR.');d.classList.remove('hidden');d.scrollIntoView({behavior:'smooth'})}
+  });
   document.getElementById('dl').onclick=function(){
     var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain'}));
     a.download='application-'+(fullName()||'applicant').replace(/,/g,'').replace(/\s+/g,'_')+'.txt';a.click();
@@ -770,15 +834,22 @@ var ASSETS={
 };
 dbp=SBA;loadPositions();
 function saveApp(d){
-  var m=$('saveMsg');m.textContent=T('Isinusumite ang aplikasyon…');
-  (async function(){
-    try{
-      if(!dbp)throw 0;
-      $('copyBox').classList.add('hidden');
-      await dbp.collection('applications').doc(d.id).set(d);
-      m.textContent=T('Matagumpay na naisumite ang iyong aplikasyon sa HR. Maraming salamat!');
-    }catch(e){console.error(e);$('copyBox').classList.remove('hidden');m.textContent=T('Hindi naipadala ang aplikasyon sa HR. I-download ang kopya sa ibaba at ibigay sa HR.')}
+  return (async function(){
+    try{if(!dbp)throw 0;await dbp.collection('applications').doc(d.id).set(d);return true}
+    catch(e){console.error(e);return false}
   })();
+}
+var subTimer=null;
+function hideSub(){clearTimeout(subTimer);$('subOv').classList.add('hidden')}
+function finishSub(){hideSub();form.reset();window.scrollTo({top:0,behavior:'smooth'})}
+function showSub(mode){
+  var ov=$('subOv'),ic=$('subIc'),ok=$('subOk');ov.classList.remove('hidden');clearTimeout(subTimer);
+  ic.className='ic '+(mode==='busy'?'spin':'ok');ic.textContent=mode==='busy'?'':'\u2713';
+  $('subT').textContent=T(mode==='busy'?'Isinusumite ang aplikasyon…':'Matagumpay na naisumite!');
+  $('subM').textContent=mode==='busy'?'':T('Matagumpay na naisumite ang iyong aplikasyon sa HR. Maraming salamat!');
+  $('subB').classList.toggle('hidden',mode==='busy');
+  ok.textContent=T('OK');ok.onclick=finishSub;
+  if(mode==='ok'){ok.focus();subTimer=setTimeout(finishSub,6000)}
 }
 function show(v){var lg=document.querySelector('.lang');if(lg)lg.classList.toggle('hidden',v==='admin');$('viewForm').classList.toggle('hidden',v!=='form');$('viewAdmin').classList.toggle('hidden',v!=='admin');window.scrollTo(0,0)}
 var unlocked=false,cfg=null;
@@ -1031,7 +1102,7 @@ function buildFolders(total,cnt){
   if(NOTE){var p=document.createElement('p');p.className='cnt';p.style.color='var(--grn)';p.style.fontWeight='600';p.textContent=NOTE;f.appendChild(p)}
 }
 var HRO=['Qualified for Initial Interview','For Further Assessment','Not Qualified'];
-function scr(r){var q=(REV[r.id]&&REV[r.id].screen)||{};return [q.result||'',q.remarks||'',q.staff||'',q.date||'']}
+function scr(r){var q=(REV[r.id]&&REV[r.id].screen)||{};return [q.result||'',q.remarks||'']}
 function todayISO(){var t=new Date();return t.getFullYear()+'-'+('0'+(t.getMonth()+1)).slice(-2)+'-'+('0'+t.getDate()).slice(-2)}
 function hrPanel(r){
   var sc=(REV[r.id]&&REV[r.id].screen)||{},box=document.createElement('div');box.className='hrbox';
@@ -1047,14 +1118,7 @@ function hrPanel(r){
   box.appendChild(og);
   var l1=document.createElement('span');l1.className='lb2';l1.textContent='Remarks / Important Notes:';
   var ta=document.createElement('textarea');ta.value=sc.remarks||'';ta.maxLength=1500;
-  var row=document.createElement('div');row.className='row2';
-  var c1=document.createElement('div'),c2=document.createElement('div');
-  var l2=document.createElement('span');l2.className='lb2';l2.textContent='HR Staff:';
-  var st=document.createElement('input');st.type='text';st.value=sc.staff||'';st.maxLength=80;
-  var l3=document.createElement('span');l3.className='lb2';l3.textContent='Screening Date:';
-  var dt=document.createElement('input');dt.type='date';dt.value=sc.date||todayISO();
-  c1.append(l2,st);c2.append(l3,dt);row.append(c1,c2);
-  box.append(l1,ta,row);
+  box.append(l1,ta);
   var bar=document.createElement('div');bar.className='acts';
   var sv=document.createElement('button');sv.type='button';sv.textContent='I-save ang Assessment';
   var msg=document.createElement('span');msg.className='sm';
@@ -1062,7 +1126,7 @@ function hrPanel(r){
   sv.onclick=function(){
     var ch=box.querySelector('input[type=radio]:checked');
     if(!ch){msg.textContent='Pumili muna ng assessment.';msg.style.color='var(--err)';return}
-    var o={result:ch.value,remarks:ta.value.trim(),staff:st.value.trim(),date:dt.value,at:Date.now()};
+    var o={result:ch.value,remarks:ta.value.trim(),at:Date.now()};
     msg.style.color='';msg.textContent='Sine-save…';sv.disabled=true;
     var stt=HRMAP[ch.value];NOTE='✓ Na-update ang status ni '+(r.name||'aplikante')+': '+stt;clearNote();
     dbp.collection('reviews').doc(r.id).set(Object.assign({},REV[r.id]||{},{screen:o,status:stt})).then(function(){msg.textContent='✓ Na-save · status: '+stt},function(){msg.style.color='var(--err)';msg.textContent='Hindi na-save. Subukan muli.'}).then(function(){sv.disabled=false});
@@ -1143,7 +1207,7 @@ function render(){
 $('csv').onclick=async function(){
   var cols=[];rows.forEach(function(r){Object.keys(r.ans||{}).forEach(function(k){if(cols.indexOf(k)<0)cols.push(k)})});
   var q=function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'};
-  var out=[['Petsa ng Pagsumite','Status','Position'].concat(cols).concat(['Initial Screening','Screening Remarks','HR Staff','Screening Date']).map(q).join(',')];
+  var out=[['Petsa ng Pagsumite','Status','Position'].concat(cols).concat(['Initial Screening','Screening Remarks']).map(q).join(',')];
   rows.forEach(function(r){out.push([new Date(r.submittedAt).toLocaleString('en-PH'),r.status,r.position].concat(cols.map(function(k){return (r.ans||{})[k]})).concat(scr(r)).map(q).join(','))});
   try{var bl=new Blob(['\ufeff'+out.join('\n')],{type:'text/csv;charset=utf-8'}),an=document.createElement('a');an.href=URL.createObjectURL(bl);an.download='applications.csv';document.body.appendChild(an);an.click();an.remove()}catch(e){}
 };
@@ -1197,7 +1261,7 @@ function printRec(r){
   var hd=mk('div','phd');hd.appendChild(mk('div','pco','RAYANTON FARMS & LIVESTOCK CORP.'));hd.appendChild(mk('div','pti','Applicant Registration Form'));pa.appendChild(hd);
   var v=recView(r,true);
   var sc=scr(r),hr=[];
-  [['Initial Screening',sc[0]],['Screening Remarks',sc[1]],['HR Staff',sc[2]],['Screening Date',sc[3]]].forEach(function(x){if(x[1])hr.push([x[0],String(x[1]),x[0]==='Screening Remarks'])});
+  [['Initial Screening',sc[0]],['Screening Remarks',sc[1]]].forEach(function(x){if(x[1])hr.push([x[0],String(x[1]),x[0]==='Screening Remarks'])});
   if(hr.length)v.appendChild(recGrid('PARA SA HR DEPARTMENT LAMANG',hr));
   pa.appendChild(v);
   if(window.trTree)window.trTree(pa);
